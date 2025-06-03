@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Container,
   Paper,
@@ -18,7 +18,6 @@ import {
   useMediaQuery,
   TextField,
   InputAdornment,
-  Grid,
 } from '@mui/material';
 import { Visibility, Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -74,7 +73,6 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const isLargeScreen = useMediaQuery('(min-width:1920px)');
 
   const filteredOrders = orders.filter(order => 
@@ -136,8 +134,8 @@ const Orders = () => {
           px: { xs: 2, sm: 3, md: 4 }
         }}
       >
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box>
             <Box sx={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
@@ -184,9 +182,9 @@ const Orders = () => {
                 }}
               />
             </Box>
-          </Grid>
+          </Box>
 
-          <Grid item xs={12}>
+          <Box>
             {isMobile ? (
               <Box sx={{ mt: 2 }}>
                 {filteredOrders.map((order) => (
@@ -320,8 +318,8 @@ const Orders = () => {
                 </Typography>
               </Paper>
             )}
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
     </Box>
   );
