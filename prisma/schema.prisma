@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(CUSTOMER)
+  phone         String?
+  address       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  orders        Order[]
+  notifications Notification[]
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  orderNumber   String    @unique
+  status        OrderStatus @default(PENDING)
+  customerId    String
+  customer      User      @relation(fields: [customerId], references: [id])
+  items         OrderItem[]
+  totalAmount   Float
+  deliveryDate  DateTime
+  deliveryAddress String
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  notifications Notification[]
+  production    Production?
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  quantity    Int
+  price       Float
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  category    ProductCategory
+  imageUrl    String?
+  isAvailable Boolean  @default(true)
+  items       OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Production {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  order       Order    @relation(fields: [orderId], references: [id])
+  status      ProductionStatus @default(SCHEDULED)
+  startTime   DateTime?
+  endTime     DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  type      NotificationType
+  read      Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+  PRODUCTION_MANAGER
+  DELIVERY_DRIVER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PRODUCTION
+  READY_FOR_DELIVERY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum ProductionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  DELAYED
+  CANCELLED
+}
+
+enum ProductCategory {
+  BREAD
+  PASTRY
+  CAKE
+  COOKIE
+  SPECIAL_ORDER
+}
+
+enum NotificationType {
+  ORDER_STATUS
+  PRODUCTION_UPDATE
+  DELIVERY_UPDATE
+  SYSTEM
+}
