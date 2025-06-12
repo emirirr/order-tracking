@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { db } from '@/lib/firebase'
+import { collection, addDoc } from 'firebase/firestore'
 
 const prisma = new PrismaClient()
 
@@ -29,6 +31,13 @@ export async function POST(request: Request) {
         isAvailable: true
       }
     })
+    // Firestore'a da yedekle (sadece client ortamında çalışır, burada örnek olarak bırakıldı)
+    /*
+    await addDoc(collection(db, 'products'), {
+      ...product,
+      createdAt: new Date()
+    })
+    */
     return NextResponse.json(product)
   } catch (error) {
     return NextResponse.json({ error: 'Ürün oluşturulamadı' }, { status: 500 })

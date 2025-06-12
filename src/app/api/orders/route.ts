@@ -27,16 +27,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { customerId, items } = body;
-
-    if (!customerId || !items || items.length === 0) {
-      return NextResponse.json(
-        { error: 'Müşteri ID ve ürünler belirtilmeli' },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.json()
+    
     // Sipariş numarası oluştur (örn: ORD-2024-001)
     const date = new Date()
     const year = date.getFullYear()
@@ -55,12 +47,17 @@ export async function POST(request: Request) {
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        customerId,
+        customerId: body.customerId,
+        totalAmount: body.totalAmount,
+        deliveryDate: new Date(body.deliveryDate),
+        deliveryAddress: body.deliveryAddress,
+        notes: body.notes,
         items: {
-          create: items.map((item: { productId: string; quantity: number }) => ({
+          create: body.items.map((item: any) => ({
             productId: item.productId,
             quantity: item.quantity,
-          })),
+            price: item.price
+          }))
         },
         production: {
           create: {
@@ -90,10 +87,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(order)
   } catch (error) {
-    console.error('Sipariş oluşturulamadı:', error);
-    return NextResponse.json(
-      { error: 'Sipariş oluşturulamadı' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Sipariş oluşturulamadı' }, { status: 500 })
   }
-}
+} 

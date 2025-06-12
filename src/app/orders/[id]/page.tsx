@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 
 interface Order {
   id: string
@@ -35,6 +36,7 @@ interface Order {
 export default function OrderDetails() {
   const params = useParams()
   const router = useRouter()
+  const { user } = useAuth()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
@@ -101,6 +103,56 @@ export default function OrderDetails() {
       default:
         return 'bg-gray-500'
     }
+  }
+
+  // Üretim aşaması güncelleme butonları (sadece üretim sorumlusu ve admin görür)
+  const renderProductionActions = () => {
+    if (!user || (user.role !== 'PRODUCTION_MANAGER' && user.role !== 'ADMIN')) return null
+    if (!order) return null
+    const status = order.production.status
+    return (
+      <div className="border-t border-gray-700 pt-4">
+        <h3 className="font-bold mb-4">Durum Güncelle</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {status === 'SCHEDULED' && (
+            <button
+              onClick={() => updateProductionStatus('IN_PROGRESS')}
+              disabled={updating}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              Üretime Al
+            </button>
+          )}
+          {status === 'IN_PROGRESS' && (
+            <button
+              onClick={() => updateProductionStatus('COMPLETED')}
+              disabled={updating}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              Üretimi Tamamla
+            </button>
+          )}
+          {(status === 'COMPLETED' || status === 'READY_FOR_DELIVERY') && (
+            <button
+              onClick={() => updateProductionStatus('OUT_FOR_DELIVERY')}
+              disabled={updating}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              Teslimata Çıkar
+            </button>
+          )}
+          {status === 'OUT_FOR_DELIVERY' && (
+            <button
+              onClick={() => updateProductionStatus('DELIVERED')}
+              disabled={updating}
+              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              Teslim Edildi
+            </button>
+          )}
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -230,25 +282,7 @@ export default function OrderDetails() {
                   </div>
                 )}
 
-                <div className="border-t border-gray-700 pt-4">
-                  <h3 className="font-bold mb-4">Durum Güncelle</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => updateProductionStatus('IN_PROGRESS')}
-                      disabled={updating || order.production.status === 'IN_PROGRESS'}
-                      className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-                    >
-                      Üretime Başla
-                    </button>
-                    <button
-                      onClick={() => updateProductionStatus('COMPLETED')}
-                      disabled={updating || order.production.status === 'COMPLETED'}
-                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-                    >
-                      Üretimi Tamamla
-                    </button>
-                  </div>
-                </div>
+                {renderProductionActions()}
               </div>
             </div>
           </div>
