@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { db } from '@/lib/firebase'
-import { collection, addDoc } from 'firebase/firestore'
 
 const prisma = new PrismaClient()
 
@@ -25,7 +23,7 @@ export async function GET() {
       }
     })
     return NextResponse.json(productions)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Üretim bilgileri alınamadı' }, { status: 500 })
   }
 }
@@ -33,7 +31,6 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
     const production = await prisma.production.update({
       where: {
         orderId: body.orderId
@@ -57,7 +54,6 @@ export async function POST(request: Request) {
         }
       }
     })
-
     // Sipariş durumunu güncelle
     let orderStatus = 'PENDING'
     switch (body.status) {
@@ -71,7 +67,6 @@ export async function POST(request: Request) {
         orderStatus = 'CANCELLED'
         break
     }
-
     await prisma.order.update({
       where: {
         id: body.orderId
@@ -80,8 +75,6 @@ export async function POST(request: Request) {
         status: orderStatus
       }
     })
-
-    // Bildirim oluştur
     await prisma.notification.create({
       data: {
         message: `Üretim durumu güncellendi: ${body.status}`,
@@ -90,17 +83,8 @@ export async function POST(request: Request) {
         orderId: body.orderId
       }
     })
-
-    // Firestore'a da yedekle (sadece client ortamında çalışır, burada örnek olarak bırakıldı)
-    /*
-    await addDoc(collection(db, 'productions'), {
-      ...production,
-      updatedAt: new Date()
-    })
-    */
-
     return NextResponse.json(production)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Üretim güncellenemedi' }, { status: 500 })
   }
 } 

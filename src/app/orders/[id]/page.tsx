@@ -43,6 +43,7 @@ export default function OrderDetails() {
 
   useEffect(() => {
     fetchOrderDetails()
+    // eslint-disable-next-line
   }, [params.id])
 
   const fetchOrderDetails = async () => {

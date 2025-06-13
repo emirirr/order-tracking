@@ -32,8 +32,8 @@ export default function Login() {
       else if (role === 'PRODUCTION_MANAGER') router.push('/dashboard')
       else if (role === 'DELIVERY_DRIVER') router.push('/dashboard')
       else router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError((err as Error).message)
     }
     setLoading(false)
   }

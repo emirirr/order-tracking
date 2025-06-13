@@ -39,8 +39,11 @@ export default function Dashboard() {
 
   const fetchOrders = async () => {
     try {
+      console.log('Fetching orders...')
       const response = await fetch('/api/orders')
+      console.log('Response status:', response.status)
       const data = await response.json()
+      console.log('Orders data:', data)
       setOrders(data)
       setOrdersLoading(false)
     } catch (error) {

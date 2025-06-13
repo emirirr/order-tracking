@@ -20,7 +20,7 @@ export async function GET() {
       }
     })
     return NextResponse.json(orders)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Siparişler alınamadı' }, { status: 500 })
   }
 }
@@ -28,7 +28,6 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
     // Sipariş numarası oluştur (örn: ORD-2024-001)
     const date = new Date()
     const year = date.getFullYear()
@@ -37,13 +36,11 @@ export async function POST(request: Request) {
         orderNumber: 'desc'
       }
     })
-    
     let orderNumber = 'ORD-2024-001'
     if (lastOrder) {
       const lastNumber = parseInt(lastOrder.orderNumber.split('-')[2])
       orderNumber = `ORD-${year}-${String(lastNumber + 1).padStart(3, '0')}`
     }
-
     const order = await prisma.order.create({
       data: {
         orderNumber,
@@ -74,8 +71,6 @@ export async function POST(request: Request) {
         production: true
       }
     })
-
-    // Bildirim oluştur
     await prisma.notification.create({
       data: {
         message: `Yeni sipariş oluşturuldu: ${orderNumber}`,
@@ -84,9 +79,8 @@ export async function POST(request: Request) {
         orderId: order.id
       }
     })
-
     return NextResponse.json(order)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Sipariş oluşturulamadı' }, { status: 500 })
   }
 } 

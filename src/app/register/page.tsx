@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { auth, db } from '@/lib/firebase'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { collection, addDoc } from 'firebase/firestore'
+import { doc, setDoc } from 'firebase/firestore'
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -22,8 +22,8 @@ export default function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(userCredential.user, { displayName: name })
-      // Firestore'a kullanıcı kaydı
-      await addDoc(collection(db, 'users'), {
+      // Create user document with UID as document ID
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
         uid: userCredential.user.uid,
         name,
         email,
@@ -31,8 +31,12 @@ export default function Register() {
         createdAt: new Date()
       })
       router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      if ((err as any).code === 'auth/email-already-in-use') {
+        setError('Bu e-posta adresi zaten kullanımda. Lütfen başka bir e-posta adresi deneyin veya giriş yapın.')
+      } else {
+        setError((err as Error).message)
+      }
     }
     setLoading(false)
   }

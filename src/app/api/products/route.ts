@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { db } from '@/lib/firebase'
-import { collection, addDoc } from 'firebase/firestore'
 
 const prisma = new PrismaClient()
 
@@ -13,7 +11,7 @@ export async function GET() {
       }
     })
     return NextResponse.json(products)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Ürünler alınamadı' }, { status: 500 })
   }
 }
@@ -21,25 +19,21 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+    const { name, description, price, category } = body
+    if (!name || !price || !category) {
+      return NextResponse.json({ error: 'Zorunlu alanlar eksik' }, { status: 400 })
+    }
     const product = await prisma.product.create({
       data: {
-        name: body.name,
-        description: body.description,
-        price: body.price,
-        category: body.category,
-        imageUrl: body.imageUrl,
+        name,
+        description,
+        price,
+        category,
         isAvailable: true
       }
     })
-    // Firestore'a da yedekle (sadece client ortamında çalışır, burada örnek olarak bırakıldı)
-    /*
-    await addDoc(collection(db, 'products'), {
-      ...product,
-      createdAt: new Date()
-    })
-    */
     return NextResponse.json(product)
-  } catch (error) {
-    return NextResponse.json({ error: 'Ürün oluşturulamadı' }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Ürün eklenemedi' }, { status: 500 })
   }
 } 
