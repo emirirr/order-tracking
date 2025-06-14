@@ -3,15 +3,16 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+// API handler
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }  // ✅ Doğru tip burada
 ) {
+  const { id } = context.params
+
   try {
     const order = await prisma.order.findUnique({
-      where: {
-        id: params.id
-      },
+      where: { id },
       include: {
         customer: {
           select: {
@@ -35,10 +36,7 @@ export async function GET(
     })
 
     if (!order) {
-      return NextResponse.json(
-        { error: 'Sipariş bulunamadı' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Sipariş bulunamadı' }, { status: 404 })
     }
 
     return NextResponse.json(order)
@@ -49,4 +47,4 @@ export async function GET(
       { status: 500 }
     )
   }
-} 
+}
