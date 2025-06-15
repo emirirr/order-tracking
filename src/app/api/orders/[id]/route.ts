@@ -3,15 +3,12 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop(); // Extract id from the URL
     const order = await prisma.order.findUnique({
-      where: {
-        id: params.id
-      },
+      where: { id },
       include: {
         customer: {
           select: {

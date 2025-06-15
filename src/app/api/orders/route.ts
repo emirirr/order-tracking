@@ -3,6 +3,12 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+interface OrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+}
+
 export async function GET() {
   try {
     const orders = await prisma.order.findMany({
@@ -50,7 +56,7 @@ export async function POST(request: Request) {
         deliveryAddress: body.deliveryAddress,
         notes: body.notes,
         items: {
-          create: body.items.map((item: any) => ({
+          create: body.items.map((item: OrderItem) => ({
             productId: item.productId,
             quantity: item.quantity,
             price: item.price

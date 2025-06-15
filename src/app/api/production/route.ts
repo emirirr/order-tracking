@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, OrderStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -55,16 +55,16 @@ export async function POST(request: Request) {
       }
     })
     // Sipariş durumunu güncelle
-    let orderStatus = 'PENDING'
+    let orderStatus: OrderStatus = OrderStatus.PENDING
     switch (body.status) {
       case 'IN_PROGRESS':
-        orderStatus = 'IN_PRODUCTION'
+        orderStatus = OrderStatus.IN_PRODUCTION
         break
       case 'COMPLETED':
-        orderStatus = 'READY_FOR_DELIVERY'
+        orderStatus = OrderStatus.READY_FOR_DELIVERY
         break
       case 'CANCELLED':
-        orderStatus = 'CANCELLED'
+        orderStatus = OrderStatus.CANCELLED
         break
     }
     await prisma.order.update({

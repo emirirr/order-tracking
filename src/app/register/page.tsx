@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { auth, db } from '@/lib/firebase'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
+import { FirebaseError } from 'firebase/app'
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -32,7 +33,7 @@ export default function Register() {
       })
       router.push('/dashboard')
     } catch (err) {
-      if ((err as any).code === 'auth/email-already-in-use') {
+      if (err instanceof FirebaseError && err.code === 'auth/email-already-in-use') {
         setError('Bu e-posta adresi zaten kullanımda. Lütfen başka bir e-posta adresi deneyin veya giriş yapın.')
       } else {
         setError((err as Error).message)

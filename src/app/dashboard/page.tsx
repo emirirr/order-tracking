@@ -34,7 +34,6 @@ export default function Dashboard() {
     if (!loading && user) {
       fetchOrders()
     }
-    // eslint-disable-next-line
   }, [loading, user])
 
   const fetchOrders = async () => {

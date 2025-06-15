@@ -33,7 +33,8 @@ export async function POST(request: Request) {
       }
     })
     return NextResponse.json(product)
-  } catch {
+  } catch (error) {
+    console.error('Ürün eklenemedi:', error)
     return NextResponse.json({ error: 'Ürün eklenemedi' }, { status: 500 })
   }
 } 

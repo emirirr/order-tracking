@@ -21,7 +21,6 @@ const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#00C49F', '#FFBB28'
 export default function Reports() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchOrders()
@@ -34,7 +33,7 @@ export default function Reports() {
       setOrders(data)
       setLoading(false)
     } catch {
-      setError('Bir hata oluştu')
+      // Handle error
     }
   }
 
