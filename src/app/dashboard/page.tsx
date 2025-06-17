@@ -35,6 +35,13 @@ export default function Dashboard() {
   const fetchOrders = async () => {
     try {
       const response = await fetch('/api/orders')
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Siparişler alınamadı:', errorData.error || 'Bilinmeyen Hata');
+        setOrders([]); // Hata durumunda boş bir dizi ayarlayabiliriz
+        setLoading(false);
+        return; // İşlemi burada sonlandır
+      }
       const data = await response.json()
       setOrders(data)
       setLoading(false)

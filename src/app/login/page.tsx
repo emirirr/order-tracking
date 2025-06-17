@@ -3,24 +3,47 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { auth } from '@/lib/firebase'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setLoading(true)
 
     try {
-      // Burada gerçek API çağrısı yapılacak
-      // Örnek başarılı giriş
+      await signInWithEmailAndPassword(auth, email, password)
       router.push('/dashboard')
-    } catch (err) {
-      setError('Giriş başarısız. Lütfen bilgilerinizi kontrol edin.')
+    } catch (err: any) {
+      if (err instanceof FirebaseError) {
+        switch (err.code) {
+          case 'auth/user-not-found':
+          case 'auth/wrong-password':
+            setError('Geçersiz e-posta veya şifre.')
+            break
+          case 'auth/invalid-email':
+            setError('Geçersiz e-posta adresi biçimi.')
+            break
+          case 'auth/too-many-requests':
+            setError('Çok fazla başarısız giriş denemesi. Lütfen daha sonra tekrar deneyin.')
+            break
+          default:
+            setError(err.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.')
+            break
+        }
+      } else {
+        setError('Giriş başarısız. Lütfen bilgilerinizi kontrol edin.')
+      }
     }
+    setLoading(false)
   }
 
   return (
@@ -69,6 +92,7 @@ export default function Login() {
             <button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
+              disabled={loading}
             >
               Giriş Yap
             </button>
