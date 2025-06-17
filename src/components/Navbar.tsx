@@ -53,7 +53,8 @@ export default function Navbar() {
                   <Link href="/dashboard" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Dashboard</Link>
                   <Link href="/products" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Ürünler</Link>
                   <Link href="/orders" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Tüm Siparişler</Link>
-                  <Link href="/reports" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Raporlar</Link>
+                  <Link href="/admin/users" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Kullanıcı Yönetimi</Link>
+                  <Link href="/admin/reports" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Raporlar</Link>
                 </>
               )}
 
@@ -70,6 +71,7 @@ export default function Navbar() {
               {user.role === 'PRODUCTION_MANAGER' && (
                 <>
                   <Link href="/dashboard" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Üretim Paneli</Link>
+                  <Link href="/production/active-orders" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Aktif Siparişler</Link>
                 </>
               )}
 
@@ -77,6 +79,7 @@ export default function Navbar() {
               {user.role === 'DELIVERY_DRIVER' && (
                 <>
                   <Link href="/dashboard" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Teslimat Paneli</Link>
+                  <Link href="/delivery/today" className="block md:inline-block hover:text-blue-400 transition-colors py-2 md:py-0">Bugünkü Teslimatlar</Link>
                 </>
               )}
 
