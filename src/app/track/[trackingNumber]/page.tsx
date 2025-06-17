@@ -49,7 +49,7 @@ export default function OrderDetails() {
         
         setOrder(mockOrder)
         setLoading(false)
-      } catch (err) {
+      } catch {
         setError('Sipariş bilgileri alınamadı')
         setLoading(false)
       }

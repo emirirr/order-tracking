@@ -34,13 +34,38 @@ interface UserFirestoreData {
   phone?: string;
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request) {
   try {
+<<<<<<< HEAD
     const orderDocRef = doc(db, 'orders', params.id);
     const orderDoc = await getDoc(orderDocRef);
+=======
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop(); // Extract id from the URL
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        customer: {
+          select: {
+            name: true,
+            email: true,
+            phone: true
+          }
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                category: true
+              }
+            }
+          }
+        },
+        production: true
+      }
+    })
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
 
     if (!orderDoc.exists()) {
       return NextResponse.json(

@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -61,19 +61,18 @@ model Product {
   name        String
   description String?
   price       Float
-  category    ProductCategory
-  imageUrl    String?
+  category    String
   isAvailable Boolean  @default(true)
-  items       OrderItem[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  items       OrderItem[]
 }
 
 model Production {
   id          String   @id @default(cuid())
   orderId     String   @unique
   order       Order    @relation(fields: [orderId], references: [id])
-  status      ProductionStatus @default(SCHEDULED)
+  status      String
   startTime   DateTime?
   endTime     DateTime?
   notes       String?
@@ -82,16 +81,16 @@ model Production {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  message   String
-  type      NotificationType
-  read      Boolean  @default(false)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  message     String
+  type        String
+  read        Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum Role {

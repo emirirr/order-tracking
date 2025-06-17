@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { db } from '@/lib/firebase'
+import { collection, addDoc } from 'firebase/firestore'
 
 interface Product {
   id: string
@@ -95,6 +97,12 @@ export default function NewOrder() {
       })
 
       if (response.ok) {
+        const order = await response.json()
+        // Firestore'a da yedekle
+        await addDoc(collection(db, 'orders'), {
+          ...order,
+          createdAt: new Date()
+        })
         router.push('/dashboard')
       }
     } catch (error) {

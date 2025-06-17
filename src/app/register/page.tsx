@@ -11,7 +11,11 @@ export default function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+<<<<<<< HEAD
   const [role, setRole] = useState('CUSTOMER') // Default role
+=======
+  const [role, setRole] = useState('CUSTOMER')
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -23,12 +27,17 @@ export default function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(userCredential.user, { displayName: name })
+<<<<<<< HEAD
       
       // Create user document with UID as document ID in Firestore
+=======
+      // Create user document with UID as document ID
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         uid: userCredential.user.uid,
         name,
         email,
+<<<<<<< HEAD
         role, // Save the selected role
         createdAt: new Date().toISOString()
       })
@@ -52,6 +61,17 @@ export default function Register() {
         setError('Bu e-posta adresi zaten kullanımda. Lütfen başka bir e-posta adresi deneyin veya giriş yapın.')
       } else {
         setError(err.message || 'Bir hata oluştu')
+=======
+        role,
+        createdAt: new Date()
+      })
+      router.push('/dashboard')
+    } catch (err) {
+      if (err instanceof FirebaseError && err.code === 'auth/email-already-in-use') {
+        setError('Bu e-posta adresi zaten kullanımda. Lütfen başka bir e-posta adresi deneyin veya giriş yapın.')
+      } else {
+        setError((err as Error).message)
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
       }
     }
     setLoading(false)
@@ -102,9 +122,15 @@ export default function Register() {
                 className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
               >
                 <option value="CUSTOMER">Müşteri</option>
+<<<<<<< HEAD
                 <option value="ADMIN">Admin</option>
                 <option value="PRODUCTION_MANAGER">Üretim Sorumlusu</option>
                 <option value="DELIVERY_DRIVER">Teslimatçı</option>
+=======
+                <option value="PRODUCTION_MANAGER">Üretim Sorumlusu</option>
+                <option value="DELIVERY_DRIVER">Teslimatçı</option>
+                <option value="ADMIN">Admin</option>
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
               </select>
             </div>
             <button

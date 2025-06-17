@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { collection, getDocs, doc, getDoc, updateDoc, query, where, addDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+=======
+import { PrismaClient, OrderStatus } from '@prisma/client'
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
 
 interface ProductionFirestoreData {
   orderId: string;
@@ -97,6 +101,7 @@ export async function GET() {
           orderData = { ...orderData, customer: customerData, items: itemsWithProductNames };
         }
       }
+<<<<<<< HEAD
 
       return {
         ...productionData,
@@ -108,11 +113,18 @@ export async function GET() {
   } catch (error) {
     console.error('Üretim bilgileri alınamadı:', error);
     return NextResponse.json({ error: 'Üretim bilgileri alınamadı' }, { status: 500 });
+=======
+    })
+    return NextResponse.json(productions)
+  } catch {
+    return NextResponse.json({ error: 'Üretim bilgileri alınamadı' }, { status: 500 })
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
   }
 }
 
 export async function POST(request: Request) {
   try {
+<<<<<<< HEAD
     const body = await request.json();
     const { orderId, status, startTime, endTime, notes } = body;
 
@@ -177,5 +189,63 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Üretim güncellenemedi:', error);
     return NextResponse.json({ error: 'Üretim güncellenemedi' }, { status: 500 });
+=======
+    const body = await request.json()
+    const production = await prisma.production.update({
+      where: {
+        orderId: body.orderId
+      },
+      data: {
+        status: body.status,
+        startTime: body.startTime ? new Date(body.startTime) : undefined,
+        endTime: body.endTime ? new Date(body.endTime) : undefined,
+        notes: body.notes
+      },
+      include: {
+        order: {
+          include: {
+            customer: true,
+            items: {
+              include: {
+                product: true
+              }
+            }
+          }
+        }
+      }
+    })
+    // Sipariş durumunu güncelle
+    let orderStatus: OrderStatus = OrderStatus.PENDING
+    switch (body.status) {
+      case 'IN_PROGRESS':
+        orderStatus = OrderStatus.IN_PRODUCTION
+        break
+      case 'COMPLETED':
+        orderStatus = OrderStatus.READY_FOR_DELIVERY
+        break
+      case 'CANCELLED':
+        orderStatus = OrderStatus.CANCELLED
+        break
+    }
+    await prisma.order.update({
+      where: {
+        id: body.orderId
+      },
+      data: {
+        status: orderStatus
+      }
+    })
+    await prisma.notification.create({
+      data: {
+        message: `Üretim durumu güncellendi: ${body.status}`,
+        type: 'PRODUCTION_UPDATE',
+        userId: production.order.customerId,
+        orderId: body.orderId
+      }
+    })
+    return NextResponse.json(production)
+  } catch {
+    return NextResponse.json({ error: 'Üretim güncellenemedi' }, { status: 500 })
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
   }
 } 

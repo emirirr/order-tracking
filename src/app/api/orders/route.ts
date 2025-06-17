@@ -41,6 +41,12 @@ interface OrderFirestoreData {
   updatedAt: string
 }
 
+interface OrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+}
+
 export async function GET() {
   try {
     const ordersCollection = collection(db, 'orders')
@@ -78,8 +84,12 @@ export async function GET() {
     }))
 
     return NextResponse.json(orders)
+<<<<<<< HEAD
   } catch (error) {
     console.error('Siparişler alınamadı:', error)
+=======
+  } catch {
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
     return NextResponse.json({ error: 'Siparişler alınamadı' }, { status: 500 })
   }
 }
@@ -87,6 +97,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+<<<<<<< HEAD
     const { customerId, items, totalAmount, deliveryDate, deliveryAddress, notes } = body
 
     // Generate order number
@@ -116,6 +127,39 @@ export async function POST(request: Request) {
           product: { // Denormalize product info directly into the order item
             name: productData.name,
             category: productData.category
+=======
+    // Sipariş numarası oluştur (örn: ORD-2024-001)
+    const date = new Date()
+    const year = date.getFullYear()
+    const lastOrder = await prisma.order.findFirst({
+      orderBy: {
+        orderNumber: 'desc'
+      }
+    })
+    let orderNumber = 'ORD-2024-001'
+    if (lastOrder) {
+      const lastNumber = parseInt(lastOrder.orderNumber.split('-')[2])
+      orderNumber = `ORD-${year}-${String(lastNumber + 1).padStart(3, '0')}`
+    }
+    const order = await prisma.order.create({
+      data: {
+        orderNumber,
+        customerId: body.customerId,
+        totalAmount: body.totalAmount,
+        deliveryDate: new Date(body.deliveryDate),
+        deliveryAddress: body.deliveryAddress,
+        notes: body.notes,
+        items: {
+          create: body.items.map((item: OrderItem) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        },
+        production: {
+          create: {
+            status: 'SCHEDULED'
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
           }
         }
       }
@@ -157,10 +201,23 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
       read: false
     })
+<<<<<<< HEAD
 
     return NextResponse.json({ id: docRef.id, ...orderData })
   } catch (error) {
     console.error('Sipariş oluşturulamadı:', error)
+=======
+    await prisma.notification.create({
+      data: {
+        message: `Yeni sipariş oluşturuldu: ${orderNumber}`,
+        type: 'ORDER_STATUS',
+        userId: body.customerId,
+        orderId: order.id
+      }
+    })
+    return NextResponse.json(order)
+  } catch {
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
     return NextResponse.json({ error: 'Sipariş oluşturulamadı' }, { status: 500 })
   }
 } 

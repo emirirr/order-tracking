@@ -12,8 +12,12 @@ export async function GET() {
       ...doc.data()
     }))
     return NextResponse.json(products)
+<<<<<<< HEAD
   } catch (error) {
     console.error('Ürünler alınamadı:', error)
+=======
+  } catch {
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
     return NextResponse.json({ error: 'Ürünler alınamadı' }, { status: 500 })
   }
 }
@@ -21,6 +25,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+<<<<<<< HEAD
     const { name, description, price, category, imageUrl } = body
 
     if (!name || !price || !category) {
@@ -43,5 +48,24 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Ürün oluşturulamadı:', error)
     return NextResponse.json({ error: 'Ürün oluşturulamadı' }, { status: 500 })
+=======
+    const { name, description, price, category } = body
+    if (!name || !price || !category) {
+      return NextResponse.json({ error: 'Zorunlu alanlar eksik' }, { status: 400 })
+    }
+    const product = await prisma.product.create({
+      data: {
+        name,
+        description,
+        price,
+        category,
+        isAvailable: true
+      }
+    })
+    return NextResponse.json(product)
+  } catch (error) {
+    console.error('Ürün eklenemedi:', error)
+    return NextResponse.json({ error: 'Ürün eklenemedi' }, { status: 500 })
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
   }
 } 

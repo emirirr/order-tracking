@@ -3,9 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+<<<<<<< HEAD
 import { auth } from '@/lib/firebase'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
+=======
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth, db } from '@/lib/firebase'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -18,6 +24,7 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
+<<<<<<< HEAD
 
     try {
       await signInWithEmailAndPassword(auth, email, password)
@@ -42,6 +49,24 @@ export default function Login() {
       } else {
         setError('Giriş başarısız. Lütfen bilgilerinizi kontrol edin.')
       }
+=======
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      // Kullanıcı rolünü Firestore'dan çek
+      const q = query(collection(db, 'users'), where('uid', '==', userCredential.user.uid))
+      const querySnapshot = await getDocs(q)
+      let role = 'CUSTOMER'
+      querySnapshot.forEach((doc) => {
+        role = doc.data().role
+      })
+      // Rol bazlı yönlendirme
+      if (role === 'ADMIN') router.push('/dashboard')
+      else if (role === 'PRODUCTION_MANAGER') router.push('/dashboard')
+      else if (role === 'DELIVERY_DRIVER') router.push('/dashboard')
+      else router.push('/dashboard')
+    } catch (err) {
+      setError((err as Error).message)
+>>>>>>> a7790e561d22362d6dca1f1a3b8024df167f6b14
     }
     setLoading(false)
   }
